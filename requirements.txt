@@ -1,0 +1,9 @@
+holoviews
+geoviews
+panel
+blackboxprotobuf
+pycryptodome
+jupyter-bokeh
+geopandas==1.0.0
+fiona
+typer
