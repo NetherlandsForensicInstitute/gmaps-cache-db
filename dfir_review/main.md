@@ -653,7 +653,8 @@ A small explanation of the resulting visualization:
 The visualization below is the output of the script. It replays the same route as shown earlier in Josh Hickman's reference experiments.
 The GPS replay speed is set to 5x in order to not take too long (this is also why the video appears to be speeding).
 
-![Reference experiment visualization redoing Hickman's route](./media/hickman_experiment_full.mp4)
+[![Reference experiment visualization redoing Hickman's route (link to Youtube)](https://img.youtube.com/vi/OT6usP6_Nhw/0.jpg)](https://www.youtube.com/watch?v=OT6usP6_Nhw)
+<!-- ![Reference experiment visualization redoing Hickman's route](./media/hickman_experiment_full.mp4) -->
 
 While the simulated conditions are not ideal because the increased speed causes anomalies and glitches, the anomalies 
 only strengthen the observations on the cache behavior.
@@ -662,7 +663,8 @@ Specifically the last two minutes of the example route near the destination high
 Near the destination, the application zooms in to a high level of detail and the route includes a large sweeping corner.
 The tiles form a cone-like pattern along this sweeping corner, matching the viewport in the app.
 
-![Detailed view of the last 2 minutes of the same reference experiment](./media/hickman_experiment_endzoom.mp4)
+[![Detailed view of the last 2 minutes of the same reference experiment](https://img.youtube.com/vi/OT6usP6_Nhw/3.jpg)](https://youtu.be/OT6usP6_Nhw?t=279)
+<!-- ![Detailed view of the last 2 minutes of the same reference experiment](./media/hickman_experiment_endzoom.mp4) -->
 
 ## Visualisation Results 
 The visualization experiment shows the cause of variation in zoom levels at certain locations.
