@@ -4,6 +4,7 @@ panel
 blackboxprotobuf
 pycryptodome
 jupyter-bokeh
+pandas<3
 geopandas==1.0.0
 fiona
 typer
