@@ -9,8 +9,8 @@ from Crypto.Cipher import AES
 from geopandas import GeoDataFrame
 from typing_extensions import Annotated
 
-from tiles.globalmaptiles import GlobalMercator
-from tiles.protobuf_definitions import TILE_KEY_TYPE, TILE_METADATA_TYPE
+from gmaps_cache_db.tiles.globalmaptiles import GlobalMercator
+from gmaps_cache_db.tiles.protobuf_definitions import TILE_KEY_TYPE, TILE_METADATA_TYPE
 
 GM = GlobalMercator()
 
