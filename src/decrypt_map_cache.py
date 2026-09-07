@@ -83,9 +83,9 @@ def decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
 def get_tiles(db_path: Path, aes_key: bytes):
     with sqlite3.connect(db_path) as con:
         for row in con.execute(
-            "select layer_id, metadata_nonce, metadata, data_nonce, data, priority, hashed_tile_key from tiles"
+            "select layer_id, metadata_nonce, metadata, data_nonce, data, priority from tiles"
         ).fetchall():
-            layer_id, metadata_nonce, metadata, data_nonce, data, priority, hashed_tile_key = row
+            layer_id, metadata_nonce, metadata, data_nonce, data, priority = row
 
             # plain_data is not investigated further here
             metadata_msg, plain_data = decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
@@ -94,14 +94,16 @@ def get_tiles(db_path: Path, aes_key: bytes):
             z, x, y = [metadata_msg["TileKey"]["coordinate"][k] for k in ("zoom", "x", "y")]
             timestamp = datetime.fromtimestamp(priority / 1e3)
             shape = calc_tile_shape(z, x, y)
-            yield (timestamp, layer_id.decode("ascii"), shape, hashed_tile_key)
+            # we use Google Tile grid indices for tile_id for legibility
+            tile_id = f"{z}/{x}/{y}"
+            yield (timestamp, layer_id.decode("ascii"), shape, tile_id)
 
 
 def get_tile_dataframe(key_path: Path, db_path: Path) -> GeoDataFrame:
     aes_key = get_aes_key(key_path)
     df = GeoDataFrame(
         get_tiles(db_path, aes_key),
-        columns=["timestamp", "layer_id", "shape", "hashed_tile_cache"],
+        columns=["timestamp", "layer_id", "shape", "tile_id"],
         geometry="shape",
     )
     return df
