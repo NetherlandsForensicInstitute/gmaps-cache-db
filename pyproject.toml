@@ -1,0 +1,33 @@
+[project]
+name = "gmaps-cache-db"
+version = "0.1.0"
+description = "Recover location traces of map tiles rendered by Google Maps based on user interaction"
+authors = [
+    {name = "Netherlands Forensic Institute", email = "netherlandsforensicinstitute@users.noreply.github.com"},
+]
+dependencies = [
+    "holoviews",
+    "geoviews",
+    "panel",
+    "blackboxprotobuf",
+    "pycryptodome",
+    "jupyter-bokeh",
+    "geopandas==1.0.0",
+    "fiona",
+    "typer",
+    "pandas<3",
+]
+requires-python = ">=3.13"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+"decrypt" = "python -m gmaps_cache_db.decrypt_map_cache"
+"experiment" = "python -m gmaps_cache_db.experiment"
