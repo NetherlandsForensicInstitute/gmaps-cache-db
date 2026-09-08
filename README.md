@@ -6,16 +6,19 @@ Accompanying the writeup is some code that can be used to reproduce results and 
 The code can be found under [src](./src/).
 
 # Usage
-Create a virtual environment and install the dependencies.
+This project uses [pdm](https://pdm-project.org/en/latest/) as a dependency manager. For installation of PDM, please consult the
+[PDM project website](https://pdm-project.org/en/latest/#installation).
+
+Having PDM installed, install all dependencies of the project, run the following command to install the project
+dependencies used in local development.
+
 ```commandline
-python3 -m venv venv
-. venv/bin/activate
-python3 -m pip install -r requirements.txt
+pdm sync
 ```
 
 Decrypt a map_cache database:
 ```commandline
-python3 src/decrypt_map_cache.py <KEY_PATH> <DB_PATH> <OUT_PATH.geojson>
+pdm run decrypt <KEY_PATH> <DB_PATH> <OUT_PATH.geojson>
 ```
 
 
@@ -29,11 +32,11 @@ You can then manually perform actions on the device to produce traces:
 - Replay a GPS route 
 
 ```commandline
-python3 src/experiment.py
+pdm run experiment
 # Press ctrl-c to stop, defaults to saving in /tmp
 # Decrypt the pulled map_cache
-python3 src/decrypt_map_cache.py /tmp/map_cache.key /tmp/map_cache.db /tmp/experiment.geojson
+pdm run decrypt /tmp/map_cache.key /tmp/map_cache.db /tmp/experiment.geojson
 ```
 
-Visualize your experiment side by side with the tiles using example cells in [src/visualize.ipynb](./src/visualize.ipynb).
+Visualize your experiment side by side with the tiles using example cells in [visualize.ipynb](./visualize.ipynb).
 
