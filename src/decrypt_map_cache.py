@@ -103,7 +103,7 @@ def get_tile_dataframe(key_path: Path, db_path: Path) -> GeoDataFrame:
     aes_key = get_aes_key(key_path)
     df = GeoDataFrame(
         get_tiles(db_path, aes_key),
-        columns=["timestamp", "priority", "layer_id", "shape", "tile_id", "x", "y", "z"],
+        columns=["timestamp", "timestamp_epoch", "layer_id", "shape", "tile_id", "x", "y", "z"],
         geometry="shape",
     )
     return df
