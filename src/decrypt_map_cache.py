@@ -86,6 +86,7 @@ def get_tiles(db_path: Path, aes_key: bytes):
             "select layer_id, metadata_nonce, metadata, data_nonce, data, priority from tiles"
         ).fetchall():
             layer_id, metadata_nonce, metadata, data_nonce, data, priority = row
+            layer_id = layer_id.decode("ascii")
 
             # plain_data is not investigated further here
             metadata_msg, plain_data = decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
@@ -94,15 +95,15 @@ def get_tiles(db_path: Path, aes_key: bytes):
             timestamp = datetime.fromtimestamp(priority / 1e3)
             shape = calc_tile_shape(z, x, y)
             # we use Google Tile grid indices for tile_id for legibility
-            tile_id = f"{z}/{x}/{y}"
-            yield (timestamp, priority, layer_id.decode("ascii"), shape, tile_id)
+            tile_id = f"{layer_id}/{z}/{x}/{y}"
+            yield (timestamp, priority, layer_id, shape, tile_id, x, y, z)
 
 
 def get_tile_dataframe(key_path: Path, db_path: Path) -> GeoDataFrame:
     aes_key = get_aes_key(key_path)
     df = GeoDataFrame(
         get_tiles(db_path, aes_key),
-        columns=["timestamp", "priority", "layer_id", "shape", "tile_id"],
+        columns=["timestamp", "priority", "layer_id", "shape", "tile_id", "x", "y", "z"],
         geometry="shape",
     )
     return df
