@@ -3,7 +3,7 @@ This repository contains a writeup of research done on forensic artefacts found 
 The writeup is submitted for publication on [https://dfir.pubpub.org/](https://dfir.pubpub.org/) and can be found in [dfir_review](./dfir_review/main.md).
 
 Accompanying the writeup is some code that can be used to reproduce results and perform your own experiments and analyses.
-The code can be found under [src](./src/).
+The code can be found under [gmaps_cache_db](./gmaps_cache_db/).
 
 # Usage
 This project uses [pdm](https://pdm-project.org/en/latest/) as a dependency manager. For installation of PDM, please consult the
@@ -13,7 +13,7 @@ Having PDM installed, install all dependencies of the project, run the following
 dependencies used in local development.
 
 ```commandline
-pdm sync
+pdm sync -G :all
 ```
 
 Decrypt a map_cache database:
