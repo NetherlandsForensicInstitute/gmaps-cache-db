@@ -5,6 +5,7 @@ from pathlib import Path
 import blackboxprotobuf as bbpb
 import shapely
 import typer
+import tzlocal
 from Crypto.Cipher import AES
 from geopandas import GeoDataFrame
 from typing_extensions import Annotated
@@ -82,6 +83,8 @@ def decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
 
 def get_tiles(db_path: Path, aes_key: bytes):
     with sqlite3.connect(db_path) as con:
+        local_tz = tzlocal.get_localzone()
+
         for row in con.execute(
             "select layer_id, metadata_nonce, metadata, data_nonce, data, priority from tiles"
         ).fetchall():
@@ -92,7 +95,8 @@ def get_tiles(db_path: Path, aes_key: bytes):
             metadata_msg, plain_data = decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
 
             z, x, y = [metadata_msg["TileKey"]["coordinate"][k] for k in ("zoom", "x", "y")]
-            timestamp = datetime.fromtimestamp(priority / 1e3)
+            # column "priority" is milliseconds from the UNIX epoch (UTC), display as local timezone
+            timestamp = datetime.fromtimestamp(priority / 1e3, tz=local_tz)
             shape = calc_tile_shape(z, x, y)
             # we use Google Tile grid indices for tile_id for legibility
             tile_id = f"{layer_id}/{z}/{x}/{y}"
