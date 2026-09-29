@@ -16,6 +16,7 @@ dependencies = [
     "panel",
     "pycryptodome",
     "typer",
+    "tzlocal>=5.4.4",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
