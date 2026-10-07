@@ -101,8 +101,8 @@ def get_tiles(db: sqlite3.Connection, aes_key: bytes):
         yield (timestamp, priority, layer_id, shape, tile_id, x, y, z)
 
 
-def get_tile_dataframe(key_blob: bytes, db: sqlite3.Connection) -> GeoDataFrame:
-    aes_key = get_aes_key(key_blob)
+def get_tile_dataframe(key_data: bytes, db: sqlite3.Connection) -> GeoDataFrame:
+    aes_key = get_aes_key(key_data)
     df = GeoDataFrame(
         get_tiles(db, aes_key),
         columns=["timestamp", "timestamp_epoch", "layer_id", "shape", "tile_id", "x", "y", "z"],
