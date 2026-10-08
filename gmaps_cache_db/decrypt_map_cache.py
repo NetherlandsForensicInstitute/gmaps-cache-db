@@ -27,8 +27,8 @@ def key_derivation(key: bytes) -> bytes:
     return bytes(key)
 
 
-def get_aes_key(key_path: Path) -> bytes:
-    m, _ = bbpb.decode_message(key_path.read_bytes())
+def get_aes_key(key_data: bytes) -> bytes:
+    m, _ = bbpb.decode_message(key_data)
     return key_derivation(m["1"])
 
 
@@ -81,32 +81,30 @@ def decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
     return metadata_msg, plain
 
 
-def get_tiles(db_path: Path, aes_key: bytes):
-    with sqlite3.connect(db_path) as con:
-        local_tz = tzlocal.get_localzone()
+def get_tiles(db: sqlite3.Connection, aes_key: bytes):
+    local_tz = tzlocal.get_localzone()
+    for row in db.execute(
+        "select layer_id, metadata_nonce, metadata, data_nonce, data, priority from tiles"
+    ).fetchall():
+        layer_id, metadata_nonce, metadata, data_nonce, data, priority = row
+        layer_id = layer_id.decode("ascii")
 
-        for row in con.execute(
-            "select layer_id, metadata_nonce, metadata, data_nonce, data, priority from tiles"
-        ).fetchall():
-            layer_id, metadata_nonce, metadata, data_nonce, data, priority = row
-            layer_id = layer_id.decode("ascii")
+        # plain_data is not investigated further here
+        metadata_msg, plain_data = decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
 
-            # plain_data is not investigated further here
-            metadata_msg, plain_data = decrypt_and_verify_tile(aes_key, metadata_nonce, metadata, data_nonce, data)
-
-            z, x, y = [metadata_msg["TileKey"]["coordinate"][k] for k in ("zoom", "x", "y")]
-            # column "priority" is milliseconds from the UNIX epoch (UTC), display as local timezone
-            timestamp = datetime.fromtimestamp(priority / 1e3, tz=local_tz)
-            shape = calc_tile_shape(z, x, y)
-            # we use Google Tile grid indices for tile_id for legibility
-            tile_id = f"{layer_id}/{z}/{x}/{y}"
-            yield (timestamp, priority, layer_id, shape, tile_id, x, y, z)
+        z, x, y = [metadata_msg["TileKey"]["coordinate"][k] for k in ("zoom", "x", "y")]
+        # column "priority" is milliseconds from the UNIX epoch (UTC), display as local timezone
+        timestamp = datetime.fromtimestamp(priority / 1e3, tz=local_tz)
+        shape = calc_tile_shape(z, x, y)
+        # we use Google Tile grid indices for tile_id for legibility
+        tile_id = f"{layer_id}/{z}/{x}/{y}"
+        yield (timestamp, priority, layer_id, shape, tile_id, x, y, z)
 
 
-def get_tile_dataframe(key_path: Path, db_path: Path) -> GeoDataFrame:
-    aes_key = get_aes_key(key_path)
+def get_tile_dataframe(key_data: bytes, db: sqlite3.Connection) -> GeoDataFrame:
+    aes_key = get_aes_key(key_data)
     df = GeoDataFrame(
-        get_tiles(db_path, aes_key),
+        get_tiles(db, aes_key),
         columns=["timestamp", "timestamp_epoch", "layer_id", "shape", "tile_id", "x", "y", "z"],
         geometry="shape",
     )
@@ -131,7 +129,9 @@ def main(
         print(f"Output file must end with .geojson, exiting")
         exit(-1)
 
-    df = get_tile_dataframe(key_path, db_path)
+    with sqlite3.connect(db_path) as db:
+        df = get_tile_dataframe(key_path.read_bytes(), db)
+
     print(f"Succesfully decrypted tiles, storing to: {out_path}")
     df.to_file(f"{out_path}", driver="GeoJSON", engine="fiona")
     print("Done.")
